@@ -221,6 +221,10 @@
         query,
         orderByChild,
         limitToLast,
+        onChildAdded,
+        onChildChanged,
+        onChildRemoved,
+        onValue,
       } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
       const firebaseConfig = {
@@ -378,7 +382,7 @@
 
         // Listen for comments.
         var commentsRef = database().ref("post-comments/" + postId);
-        commentsRef.on("child_added", function (data) {
+        onChildAdded(commentsRef, function (data) {
           addCommentElement(
             postElement,
             data.key,
@@ -387,7 +391,7 @@
           );
         });
 
-        commentsRef.on("child_changed", function (data) {
+        onChildChanged(commentsRef, function (data) {
           setCommentValues(
             postElement,
             data.key,
@@ -396,7 +400,7 @@
           );
         });
 
-        commentsRef.on("child_removed", function (data) {
+        onChildRemoved(commentsRef, function (data) {
           deleteComment(postElement, data.key);
         });
 
@@ -404,7 +408,7 @@
         var starCountRef = firebase
           .database()
           .ref("posts/" + postId + "/starCount");
-        starCountRef.on("value", function (snapshot) {
+        onValue(starCountRef, function (snapshot) {
           updateStarCount(postElement, snapshot.val());
         });
 
@@ -412,7 +416,7 @@
         var starredStatusRef = firebase
           .database()
           .ref("posts/" + postId + "/stars/" + uid);
-        starredStatusRef.on("value", function (snapshot) {
+        onValue(starredStatusRef, function (snapshot) {
           updateStarredByCurrentUser(postElement, snapshot.val());
         });
 
@@ -540,7 +544,7 @@
         var userPostsRef = ref(database, "user-posts/" + myUserId);
 
         var fetchPosts = function (postsRef, sectionElement) {
-          postsRef.on("child_added", function (data) {
+          onChildAdded(postsRef, function (data) {
             var author = data.val().author || "Anonymous";
 
             var containerElement =
@@ -560,7 +564,7 @@
             );
           });
 
-          postsRef.on("child_changed", function (data) {
+          onChildChanged(postsRef, function (data) {
             var containerElement =
               sectionElement.getElementsByClassName("posts-container")[0];
 
@@ -582,7 +586,7 @@
               data.val().starCount;
           });
 
-          postsRef.on("child_removed", function (data) {
+          onChildRemoved(postsRef, function (data) {
             var containerElement =
               sectionElement.getElementsByClassName("posts-container")[0];
             var post = containerElement.getElementsByClassName(
